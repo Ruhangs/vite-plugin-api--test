@@ -86,6 +86,7 @@ const handelOptions = (config) => {
         password,
         blobResponseTypeNames,
         formatModuleNames,
+        formatRouteNames,
         ignoreModuleNames,
         fixTypes,
         requiredTypes,
@@ -113,6 +114,9 @@ const handelOptions = (config) => {
             }
             if (formatModuleNames && formatModuleNames[raw.moduleName]) {
                 routeData.namespace = formatModuleNames[raw.moduleName];
+            }
+            if (formatRouteNames && formatRouteNames[routeData.namespace]?.[routeData.routeName.usage]) {
+                routeData.routeName.original = formatRouteNames[routeData.namespace][routeData.routeName.usage]
             }
             return routeData;
         };

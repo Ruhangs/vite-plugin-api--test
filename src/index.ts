@@ -15,6 +15,7 @@ interface cutomeOption {
 	password?: string
 	blobResponseTypeNames?: string[],
 	formatModuleNames?: Record<string, string>,
+	formatRouteNames?: Record<string, Record<string, string>>,
 	ignoreModuleNames?: string[],
 	fixTypes?: Record<string, Record<string, fixType>>,
 	requiredTypes?: Record<string, string[]>
