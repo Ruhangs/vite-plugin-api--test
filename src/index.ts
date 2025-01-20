@@ -33,7 +33,7 @@ export type GenerateApiOption = GenerateApiParams & cutomeOption
 
 const useName = createPluginName(false)
 
-const autGenerateApi = (options?: Partial<GenerateApiOption>): Plugin => {
+const AutoGenerateApi = (options?: Partial<GenerateApiOption>): Plugin => {
 	return {
 		name: useName('auto-generate-api'),
 		enforce: "pre",
@@ -46,5 +46,5 @@ const autGenerateApi = (options?: Partial<GenerateApiOption>): Plugin => {
 	}
 }
 
-export default autGenerateApi
-export { autGenerateApi }
+export default AutoGenerateApi
+export { AutoGenerateApi }

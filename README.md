@@ -1,90 +1,194 @@
 # vite-plugin-auto-generate-api
 
-该插件可根据 swagger 文档自动生成前端接口
-
+该插件是基于 `swagger-typescript-api` 工具优化后根据后端 `swagger` 文档自动生成前端接口工具，主要支持以下功能：
 <br />
 
-## Features 🦖
+## 功能 🦖
 
-- pnpm 的
-- `vitest` 测试
-- 开箱即用的
-- `typescript` 的
+- 自定义接口类型或名称
+- 支持配置接口字段是否必选
+- 判断 `swagger` 文档是否更新，并自动生成版本注释
+- 支持配置请求取消
+- 支持配置数据模拟
+- 支持静默错误通知
+  <br />
 
-<br />
-<br />
+## 使用方法 🦕
 
-## Usage 🦕
-
-### install
-
-```shell
-# 工作区安装
-pnpm i
-
-# 源码依赖安装
-pnpm i -w
-```
-
-### init:info
+### 安装
 
 ```shell
-pnpm init:info
+# npm
+npm install vite-plugin-auto-generate-api
+
+# pnpm
+pnpm install vite-plugin-auto-generate-api
 ```
 
-### test
+### 配置
 
-```shell
-pnpm test
+```javascript
+// vite.config.js
 
-# or pnpm test:watch
+import AutoGenerateApi from "vite-plugin-auto-generate-api"
+// 该文件具体内容请看使用说明
+import { blobResponseTypeNames, formatModuleNames, ignoreModuleNames, fixTypes, requiredTypes } from './fixed'
+...
+
+export default defineConfig({
+    ...other,
+    plugins: [
+        AutoGenerateApi({
+            // 必填项
+            url: "",
+            // 用于身份验证
+            username: "",
+            password: "",
+            // 其他配置项
+            blobResponseTypeNames,
+            formatModuleNames,
+            ignoreModuleNames,
+            fixTypes,
+            requiredTypes
+        })
+    ]
+})
+
 ```
 
-### build
+### 使用说明
 
-```shell
-pnpm build
+#### 1、接口错误修正或自定义 ---- fixed.ts
+
+```typescript
+/**
+ * 说明：此数组表示哪些请求返回的是文件流形式
+ * 具体对应swagger上的中文名称
+ *
+ */
+export const blobResponseTypeNames = ["历史数据导出", "图片下载"];
+
+/**
+ * 说明：此对象是对自动生成的后端接口文件重命名
+ * 格式如下：
+ * xxxx：'重命名名称'
+ * xxxx对应swagger请求路径中/xxxx/aaaa或/xxxx中的xxxx字段
+ */
+export const formatModuleNames = {
+  monitor: "history",
+  record: "system",
+};
+
+/**
+ * 说明：此数组是对与业务无关的接口进行屏蔽
+ * 对应swagger请求路径中/xxxx/aaaa或/xxxx中的xxxx字段
+ */
+export const ignoreModuleNames = ["healthz"];
+
+/**
+ * 说明：此对象是对后端接口定义修正
+ * 格式如下：
+ * { type: 'string' }
+ * { type: 'number' }
+ * { type: 'boolean' }
+ * { type: 'array', items: { type: 'string' } }
+ * ...
+ */
+export const fixTypes = {
+  RoleVo: {
+    authority: { type: "array", items: { type: "string" } },
+  },
+  RoleCommand: {
+    authority: { type: "array", items: { type: "string" } },
+  },
+  AccountVo: {
+    authority: { type: "array", items: { type: "string" } },
+    accountList: { type: "array", items: { type: "string" } },
+  },
+};
+
+/**
+ * 说明：此对象是对后端接口自定义必选字段
+ * 格式如下：
+ * 类型名称：['字段名称']
+ * ...
+ */
+export const requiredTypes = {
+  AccountCommand: ["password"],
+};
 ```
 
-### coverage
+#### 2、发起请求
 
-```shell
-pnpm coverage
+```javascript
+// 基本请求 params 为请求参数。option为配置项，下面会列出常用的
+const data = await historyApi.getCondition(params, option);
 ```
 
-### dev
+#### 2、数据模拟
 
-```shell
-pnpm dev
+```javascript
+// 前提配置环境变量文件和vite配置文件
+// "V_MOCK_BASE": "mock",
+// '/mock': {
+//     target: 'http://127.0.0.1:4523/m1/5761631-5445089-default/',  // 此处填写mock服务地址
+//     rewrite: path => path.replace(/^\/mock/, '')
+// }
+
+// 第一种方式，直接在使用的地方设置mock配置项为true
+const data = await historyApi.getCondition(params, {
+  mock: true,
+});
+
+// 第二种方式在api/options.ts文件中修改
+export const options = {
+  History: {
+    getCondition: {
+      mock: true,
+    },
+  },
+};
 ```
 
-### publish
+#### 3、禁用接口错误信息提示
 
-```shell
-npm publish
+```javascript
+// 第一种方式，直接在使用的地方设置silent配置项为true
+const data = await historyApi.getCondition(params, {
+  silent: true,
+});
+
+// 第二种方式在api/options.ts文件中修改
+export const options = {
+  History: {
+    getCondition: {
+      silent: true,
+    },
+  },
+};
 ```
 
-### play
+#### 4、接口取消请求
 
-```shell
-# 工作区 dev
-pnpm play
+```javascript
+// 第一种方式，直接在使用的地方设置cancel配置项为true
+const data = await historyApi.getCondition(params, {
+  cancel: true,
+});
 
-# or pnpm play:open
-# or pnpm play:host
-# or pnpm play:build
-# or pnpm play:preview
-# or pnpm play:preview:open
-# or pnpm play:preview:host
+// 第二种方式在api/options.ts文件中修改
+export const options = {
+  History: {
+    getCondition: {
+      cancel: true,
+    },
+  },
+};
+
+// 取消方式
+historyApi.cancel("getCondition");
 ```
 
-### release
-
-```shell
-pnpm release
-```
-
-<br />
 <br />
 
 ## License
