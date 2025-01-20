@@ -1,6 +1,6 @@
-# vite-plugin-template
+# vite-plugin-auto-generate-api
 
-开箱即用的 vite 插件模板
+该插件可根据 swagger 文档自动生成前端接口
 
 <br />
 
@@ -15,7 +15,6 @@
 <br />
 
 ## Usage 🦕
-
 
 ### install
 
@@ -90,7 +89,7 @@ pnpm release
 
 ## License
 
-Made with name
+Made with [ruhangs](https://github.com/ruhangs)
 
 Published under [MIT License](./LICENSE).
 

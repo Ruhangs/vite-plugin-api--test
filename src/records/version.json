@@ -1,0 +1,30 @@
+{
+    "Types": {
+        "hash": "cf1b20776ffe47807e90ffa3dc9138954a759193e8d1a9d7d974da095c4a14c4",
+        "time": "2025/1/17 18:06:52"
+    },
+    "HttpClient": {
+        "hash": "2120491a006d4982154aabdbfbb1ad41cef5c8220b989d3ebe940d839605c59d",
+        "time": "2025/1/17 18:06:52"
+    },
+    "Role": {
+        "hash": "c96805f75b70e92c9f2522168678334abde849664228d88f694cd66a14a9be03",
+        "time": "2025/1/17 18:06:52"
+    },
+    "History": {
+        "hash": "15f6254310525010b0595d04dbd7b24ae1793786793c3f2cda5f2ff7bb374826",
+        "time": "2025/1/17 18:06:52"
+    },
+    "Location": {
+        "hash": "b9ac2e954376aaf427cfedb42505da40ade8864fbe0dde2c1b753fe05b842769",
+        "time": "2025/1/17 18:06:52"
+    },
+    "Account": {
+        "hash": "f3990b24402f3f31b92fdf9eefefaa5563f9c667486083acbd12074fe51e3698",
+        "time": "2025/1/17 18:06:52"
+    },
+    "System": {
+        "hash": "e6fb93319d4e30e7ac218da509fdd526c752484b0def165333efe7b0274a45d6",
+        "time": "2025/1/17 18:06:52"
+    }
+}

@@ -8,5 +8,7 @@ export default defineConfig({
 	outDir: 'dist',
 	format: ['cjs', 'esm'],
 	entry: ['src/index.ts'],
-	noExternal: ['slash']
+	noExternal: ['slash'],
+	sourcemap: true,
+	target: "node18",
 })

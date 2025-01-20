@@ -1,0 +1,85 @@
+<% for (const file of data) { %><% const classMatch = file.fileContent.match(/class\s+(\w+)/);
+if (classMatch) { %>import { <%= classMatch[1] %> } from "./module/<%= file.fileName %>";<% }%>
+<% } %>import qs from "qs"
+import download from "downloadjs"
+<% const nameSpace = { Healthz: 'systemHealth' }; %>
+class API<SecurityDataType = unknown> extends HttpClient<SecurityDataType> {<% for (const file of data) { %><% const classMatch = file.fileContent.match(/class\s+(\w+)/);
+    if (classMatch && file.fileName !== 'HttpClient') {  %>   public <%= classMatch[1] %> = new <%= file.fileName %>(this); <% } %>
+<% } %>}
+
+const axiosApi = new API({
+    paramsSerializer: (params: any) => qs.stringify(params, { indices: false }),
+    baseURL: './' + env.V_API_BASE
+});
+
+axiosApi.instance.interceptors.request.use(
+    (config: any) => {
+        console.log(config);
+        return config;
+    },
+    (error: any) => {
+        console.log(error);
+    }
+);
+
+axiosApi.instance.interceptors.response.use(
+    (res: any) => {
+        console.log(res)
+        if (res.status === 200) {
+            const responseType = res.request.responseType
+            switch (responseType) {
+                case 'blob': {
+                    if (res.data.type === "application/json") {
+                        const blob = res.data;
+                        blob.text().then((text: string) => {
+                            res.config.headers['Silent-Tips'] ? console.error(text)
+                                : ElNotification({
+                                    title: JSON.parse(text).possibleReason,
+                                    message: JSON.parse(text).code,
+                                    type: 'error',
+                                })
+                        });
+                        return false;
+                    }
+                    const filename = res.headers['content-disposition'].split("=")[1]
+                    download(res.data, decodeURI(filename))
+                    break;
+                }
+                default: {
+                    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                    const { success, code, traceId, message, possibleReason, suggestMeasure, data, error } = res.data
+                    if (success) {
+                        return data
+                    } else {
+                        res.config.headers['Silent-Tips'] ? console.error(message)
+                            : ElNotification({
+                                title: possibleReason,
+                                message: code,
+                                type: 'error',
+                            })
+                        if (code === "401") {
+                            window.location.href = "#/login"
+                        }
+                        return Promise.reject(new Error(message));
+                    }
+                }
+            }
+        } else {
+            res.config.headers['Silent-Tips'] ? console.error(res.statusText)
+                : ElNotification({
+                    title: res.statusText,
+                    message: res.status.toString(),
+                    type: 'error',
+                })
+            return Promise.reject(new Error(res.statusText));
+        }
+    },
+    (error: any) => {
+        console.log("err" + error);
+        return Promise.reject(error);
+    }
+);
+
+export const axiosInstance = axiosApi.instance<% for (const file of data) { %><% const classMatch = file.fileContent.match(/class\s+(\w+)/);
+    if (classMatch && file.fileName !== 'HttpClient') {  %>export const <%= classMatch[1].toLowerCase() + "Api" %> = axiosApi.<%= classMatch[1] %>; <% } %>
+<% } %>
