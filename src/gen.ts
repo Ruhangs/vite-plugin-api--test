@@ -1,8 +1,8 @@
 import path from "path";
 import fs from "fs-extra";
 import ejs from "ejs";
+import _ from "lodash";
 import { generateApi } from "swagger-typescript-api";
-import { compact, camelCase, upperFirst } from "lodash";
 import {
     readFileIfExists,
     saveFile,
@@ -50,7 +50,7 @@ const apiGenerationOptions = {
                     .map((i) => (i.match(regex) ? `"${i.match(regex)[1]}"` : null))
                     .join(" | ");
             }
-            return compact([
+            return _.compact([
                 readonly && "readonly ",
                 key,
                 optional && "?",
@@ -65,8 +65,8 @@ const apiGenerationOptions = {
             const segments = route.split("/");
             const lastSegment = segments.at(-2);
             const name = pathArgs.length
-                ? `${lastSegment.includes(method) ? camelCase(lastSegment) + "By" + upperFirst(pathArgs[0].name) : method + upperFirst(camelCase(lastSegment)) + "By" + upperFirst(pathArgs[0].name)}`
-                : camelCase(segments.pop());
+                ? `${lastSegment.includes(method) ? _.camelCase(lastSegment) + "By" + _.upperFirst(pathArgs[0].name) : method + _.upperFirst(_.camelCase(lastSegment)) + "By" + _.upperFirst(pathArgs[0].name)}`
+                : _.camelCase(segments.pop());
             return name;
         },
         onPrepareConfig: (currentConfiguration) => {

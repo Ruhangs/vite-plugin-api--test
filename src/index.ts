@@ -1,5 +1,4 @@
 import type { Plugin } from 'vite'
-import { createPluginName } from './shared/create'
 import { GenerateApiParams } from 'swagger-typescript-api'
 import { autoGenerateApi } from './gen'
 
@@ -31,11 +30,10 @@ export type ApiInstanceOption = Record<string, Record<string, ApiInstanceOptionI
 
 export type GenerateApiOption = GenerateApiParams & cutomeOption
 
-const useName = createPluginName(false)
 
 const AutoGenerateApi = (options?: Partial<GenerateApiOption>): Plugin => {
 	return {
-		name: useName('auto-generate-api'),
+		name: 'vite-plugin-auto-generate-api',
 		enforce: "pre",
 		apply: "serve",
 		buildStart() {
