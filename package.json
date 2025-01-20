@@ -1,66 +1,78 @@
 {
-	"version": "0.0.0",
-	"name": "vite-plugin-name",
-	"description": "开箱即用的 vite 插件模板",
-	"main": "./dist/index.js",
-	"module": "./dist/index.mjs",
-	"types": "./dist/index.d.ts",
-	"repository": {
-		"type": "git",
-		"url": "git+https://github.com/name/repo.git"
-	},
-	"exports": {
-		"./*": "./*",
-		".": {
-			"require": "./dist/index.js",
-			"import": "./dist/index.mjs",
-			"types": "./dist/index.d.ts"
-		}
-	},
-	"files": [
-		"dist",
-		"client.d.ts"
-	],
-	"scripts": {
-		"build": "tsup",
-		"test": "vitest",
-		"test:watch": "vitest --watch",
-		"coverage": "vitest --coverage",
-		"dev": "pnpm run build -- --watch",
-		"init:info": "plop --plopfile scripts/init.js",
-		"release": "npm run build && bumpp --commit --push --tag && npm publish",
-		"play": "pnpm -C examples/vite run dev",
-		"play:open": "pnpm -C examples/vite run dev:open",
-		"play:host": "pnpm -C examples/vite run dev:host",
-		"play:build": "pnpm -C examples/vite run build",
-		"play:preview": "pnpm -C examples/vite run preview",
-		"play:preview:open": "pnpm -C examples/vite run preview:open",
-		"play:preview:host": "pnpm -C examples/vite run preview:host"
-	},
-	"keywords": [
-		"vite",
-		"plugin",
-		"template"
-	],
-	"author": {
-		"name": "name",
-		"email": "xx@xx.com",
-		"url": "https://github.com/name"
-	},
-	"bugs": {
-		"email": "xx@xx.com",
-		"url": "https://github.com/name/repo/issues"
-	},
-	"license": "MIT",
-	"devDependencies": {
-		"@types/node": "^17.0.24",
-		"bumpp": "^7.1.1",
-		"c8": "^7.11.0",
-		"esno": "^0.14.1",
-		"plop": "^3.0.5",
-		"tsup": "^5.12.5",
-		"typescript": "^4.6.3",
-		"vite": "^2.9.5",
-		"vitest": "^0.1.27"
-	}
+  "version": "1.0.0",
+  "name": "vite-plugin-auto-generate-api",
+  "description": "该插件可根据swagger文档自动生成前端接口",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ruhangs/vite-plugin-auto-generate-api.git"
+  },
+  "exports": {
+    "./*": "./*",
+    ".": {
+      "require": "./dist/index.js",
+      "import": "./dist/index.mjs",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist",
+    "templates"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "test": "vitest",
+    "test:watch": "vitest --watch",
+    "coverage": "vitest --coverage",
+    "dev": "pnpm run build -- --watch",
+    "init:info": "plop --plopfile scripts/init.js",
+    "release": "npm run build && bumpp --commit --push --tag && npm publish",
+    "play": "pnpm -C examples/vite run dev",
+    "play:open": "pnpm -C examples/vite run dev:open",
+    "play:host": "pnpm -C examples/vite run dev:host",
+    "play:build": "pnpm -C examples/vite run build",
+    "play:preview": "pnpm -C examples/vite run preview",
+    "play:preview:open": "pnpm -C examples/vite run preview:open",
+    "play:preview:host": "pnpm -C examples/vite run preview:host"
+  },
+  "keywords": [
+    "vite",
+    "plugin",
+    "template"
+  ],
+  "author": {
+    "email": "ruhangs@163.com",
+    "name": "ruhangs",
+    "url": "https://github.com/ruhangs"
+  },
+  "bugs": {
+    "email": "ruhangs@163.com",
+    "url": "https://github.com/ruhangs/vite-plugin-auto-generate-api/issues"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@types/ejs": "^3.1.5",
+    "@types/fs-extra": "^11.0.4",
+    "@types/lodash": "^4.17.14",
+    "@types/node": "^17.0.24",
+    "bumpp": "^7.1.1",
+    "c8": "^7.11.0",
+    "esno": "^0.14.1",
+    "plop": "^3.0.5",
+    "tsup": "^5.12.5",
+    "typescript": "^4.6.3",
+    "vite": "^2.9.5",
+    "vitest": "^0.1.27"
+  },
+  "dependencies": {
+    "ejs": "^3.1.10",
+    "fs-extra": "^11.3.0",
+    "lodash": "^4.17.21",
+    "swagger-typescript-api": "^13.0.23"
+  },
+  "peerDependencies": {
+    "swagger-typescript-api": ">13"
+  }
 }
