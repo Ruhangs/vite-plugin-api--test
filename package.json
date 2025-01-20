@@ -1,5 +1,5 @@
 {
-  "version": "1.0.1",
+  "version": "1.0.2",
   "name": "vite-plugin-auto-generate-api",
   "description": "该插件可根据swagger文档自动生成前端接口",
   "main": "./dist/index.js",
