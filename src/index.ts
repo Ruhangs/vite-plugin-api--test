@@ -12,7 +12,9 @@ interface fixType {
 interface cutomeOption {
 	url: string,
 	username?: string,
-	password?: string
+	password?: string,
+	outputDir: string,
+	baseUrl?: string,
 	blobResponseTypeNames?: string[],
 	formatModuleNames?: Record<string, string>,
 	formatRouteNames?: Record<string, Record<string, string>>,
@@ -29,10 +31,10 @@ interface ApiInstanceOptionItem {
 
 export type ApiInstanceOption = Record<string, Record<string, ApiInstanceOptionItem>>
 
-export type GenerateApiOption = GenerateApiParams & cutomeOption
+export type GenerateApiOption = Partial<GenerateApiParams> & cutomeOption
 
 
-const AutoGenerateApi = (options?: Partial<GenerateApiOption>): Plugin => {
+const AutoGenerateApi = (options: GenerateApiOption[]): Plugin => {
 	return {
 		name: 'vite-plugin-auto-generate-api',
 		enforce: "pre",

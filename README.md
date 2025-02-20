@@ -5,13 +5,20 @@
 
 ## 功能 🦖
 
+### 1.1.*
+
 - 自定义接口类型或名称
 - 支持配置接口字段是否必选
 - 支持配置请求取消
 - 支持配置数据模拟
 - 支持静默错误通知
 - 判断 `swagger` 文档是否更新，并自动生成版本注释
-  <br />
+
+### 1.2.*
+
+- 支持根据模块划分接口
+
+<br />
 
 ## 使用方法 🦕
 
@@ -27,6 +34,34 @@ pnpm install vite-plugin-auto-generate-api
 
 ### 配置
 
+#### 文件结构约定
+
+1. 单个模块
+```
+api/
+│
+├── modules/
+│   └── xxx.ts
+├── index.ts
+└── option.ts
+```
+
+2. 多个模块
+```
+api/
+├── module1/
+│   ├── modules/
+│   │   └── xxx.ts
+│   ├── index.ts
+│   └── option.ts
+│
+└── module2/
+    ├── modules/
+    │   └── xxx.ts
+    ├── index.ts
+    └── option.ts
+```
+#### 配置项
 ```javascript
 // vite.config.js
 
@@ -34,24 +69,45 @@ import AutoGenerateApi from "vite-plugin-auto-generate-api"
 // 该文件具体内容请看使用说明
 import { blobResponseTypeNames, formatModuleNames, formatRouteNames, ignoreModuleNames, fixTypes, requiredTypes } from './fixed'
 ...
-
 export default defineConfig({
-    ...other,
+    ...others,
     plugins: [
-        AutoGenerateApi({
+        // 单个模块的情况
+        AutoGenerateApi([{
             // 必填项
             url: "",
-            // 用于身份验证
+            outputDir: "src/api/modules" // 相对于项目根路径
+            // 用于身份验证（可选）
             username: "",
             password: "",
-            // 其他配置项
+            // 自定义接口基础路径 默认为"./" + env.V_API_BASE
+            baseUrl: "./api"
+            // 其他配置项（可选）
             blobResponseTypeNames,
             formatModuleNames,
             formatRouteNames,
             ignoreModuleNames,
             fixTypes,
             requiredTypes
-        })
+        }])
+        // 单个模块的情况
+        AutoGenerateApi([{
+            // 必填项
+            url: "",
+            outputDir: "src/api/module1/modules" // 相对于项目根路径
+            // 自定义接口基础路径 默认为"./" + env.V_API_BASE
+            baseUrl: "./api/module1"
+            // 其他配置项
+            // ...
+        },{
+            // 必填项
+            url: "",
+            outputDir: "src/api/module2/modules" // 相对于项目根路径
+            // 自定义接口基础路径 默认为"./" + env.V_API_BASE
+            baseUrl: "./api/module2"
+            // 其他配置项
+            // ...
+        }])
     ]
 })
 

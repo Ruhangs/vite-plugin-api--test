@@ -1,5 +1,5 @@
 <% for (const file of data) { %><% const classMatch = file.fileContent.match(/class\s+(\w+)/);
-if (classMatch) { %>import { <%= classMatch[1] %> } from "./module/<%= file.fileName %>";<% }%>
+if (classMatch) { %>import { <%= classMatch[1] %> } from "./modules/<%= file.fileName %>";<% }%>
 <% } %>import qs from "qs"
 import download from "downloadjs"
 <% const nameSpace = { Healthz: 'systemHealth' }; %>
@@ -9,7 +9,7 @@ class API<SecurityDataType = unknown> extends HttpClient<SecurityDataType> {<% f
 
 const axiosApi = new API({
     paramsSerializer: (params: any) => qs.stringify(params, { indices: false }),
-    baseURL: './' + env.V_API_BASE
+    baseURL: <% if(baseURL) {%>"<%= baseURL %>"<% } else { %>"./" + env.V_API_BASE<% } %>,
 });
 
 axiosApi.instance.interceptors.request.use(

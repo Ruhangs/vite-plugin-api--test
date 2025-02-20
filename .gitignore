@@ -1,3 +1,6 @@
+examples/vite/src/api/
+
 dist
 coverage
 node_modules
+records

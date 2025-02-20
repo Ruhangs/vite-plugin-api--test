@@ -11,6 +11,7 @@ import {
     axiosFilePrefix,
     Base64,
 } from "./utils";
+import { GenerateApiOption } from ".";
 
 const __filename = new URL(import.meta.url).pathname;
 
@@ -144,80 +145,81 @@ const handelOptions = (config) => {
 };
 
 // 自动生成 API 客户端
-export async function autoGenerateApi(config) {
+export async function autoGenerateApi(config: GenerateApiOption[]) {
     try {
         console.log("✔️ Starting API client generation...");
+        if (!fs.pathExistsSync(path.resolve(__dirname, "../templates"))) {
+            console.warn("✖️ Templates not found. Skipping rendering.");
+            return
+        }
         const axiosTemplatePath = path.resolve(__dirname, "../templates/axios.ejs");
         const apiOptionTemplatePath = path.resolve(
             __dirname,
             "../templates/option.ejs"
         );
         const recordFilePath = path.resolve(__dirname, "../records/version.json");
-        const outputDir = path.resolve("src/api/module");
-        const apiIndexPath = path.resolve("src/api/index.ts");
-        const apiOptionPath = path.resolve("src/api/option.ts");
+        if (Array.isArray(config) && config.length > 0) {
+            config.forEach(async (item) => {
+                const outputDir = path.resolve(item.outputDir);
+                const apiIndexPath = path.resolve(path.dirname(outputDir), "index.ts");
+                const apiOptionPath = path.resolve(path.dirname(outputDir), "option.ts");
+                const previousRecord = readFileIfExists(recordFilePath)
+                    ? JSON.parse(readFileIfExists(recordFilePath))
+                    : {};
 
-        const previousRecord = readFileIfExists(recordFilePath)
-            ? JSON.parse(readFileIfExists(recordFilePath))
-            : {};
+                // 生成 API 客户端
+                const generationResult = await generateApi(handelOptions(item));
 
-        const flag = fs.pathExistsSync(path.resolve(__dirname, "../templates"))
-        if (!flag) {
-            console.warn("✖️ Templates not found. Skipping rendering.");
-            return
+                fs.ensureDirSync(outputDir);
+
+                let filePrefix = "";
+
+                for (const {
+                    fileName,
+                    fileContent,
+                    fileExtension,
+                } of generationResult.files) {
+                    if (!previousRecord[fileName]) {
+                        previousRecord[fileName] = { hash: "", time: "" }; // Initialize hash and time if not set
+                    }
+                    const previousHash = previousRecord[fileName].hash || "";
+                    const newHash = generateFileHash(fileContent);
+                    if (newHash !== previousHash) {
+                        console.log(`✔️ The ${fileName} file has changed. Updating...`);
+                        const newTime = new Date().toLocaleString();
+                        previousRecord[fileName].hash = newHash;
+                        previousRecord[fileName].time = newTime;
+                        filePrefix = generateFilePrefix(newHash, newTime);
+                        const finalContent = `${filePrefix}${fileContent}`;
+                        saveFile(
+                            path.resolve(outputDir, `${fileName}${fileExtension}`),
+                            finalContent
+                        );
+                    } else {
+                        console.log(`✔️ No changes detected in ${fileName} file.`);
+                    }
+                }
+                saveFile(recordFilePath, JSON.stringify(previousRecord, null, 4));
+                // 渲染 Axios 模板
+                if (fs.existsSync(axiosTemplatePath)) {
+                    console.log("✔️ Rendering Axios template...");
+                    const templateContent = fs.readFileSync(axiosTemplatePath, "utf8");
+                    const renderedContent = ejs.render(templateContent, {
+                        data: generationResult.files,
+                        baseURL: item.baseUrl,
+                    });
+                    saveFile(apiIndexPath, `${axiosFilePrefix}${renderedContent}`);
+                    console.log(`✔️ Axios template rendered and saved to ${apiIndexPath}`);
+                } else {
+                    console.warn("✖️ Axios template not found. Skipping rendering.");
+                }
+
+                if (!fs.existsSync(apiOptionPath) && fs.existsSync(apiOptionTemplatePath)) {
+                    const templateContent = fs.readFileSync(apiOptionTemplatePath, "utf8");
+                    saveFile(apiOptionPath, templateContent);
+                }
+            })
         }
-
-        // 生成 API 客户端
-        const generationResult = await generateApi(handelOptions(config));
-
-        fs.ensureDirSync(outputDir);
-
-        let filePrefix = "";
-
-        for (const {
-            fileName,
-            fileContent,
-            fileExtension,
-        } of generationResult.files) {
-            if (!previousRecord[fileName]) {
-                previousRecord[fileName] = { hash: "", time: "" }; // Initialize hash and time if not set
-            }
-            const previousHash = previousRecord[fileName].hash || "";
-            const newHash = generateFileHash(fileContent);
-            if (newHash !== previousHash) {
-                console.log(`✔️ The ${fileName} file has changed. Updating...`);
-                const newTime = new Date().toLocaleString();
-                previousRecord[fileName].hash = newHash;
-                previousRecord[fileName].time = newTime;
-                filePrefix = generateFilePrefix(newHash, newTime);
-                const finalContent = `${filePrefix}${fileContent}`;
-                saveFile(
-                    path.resolve(outputDir, `${fileName}${fileExtension}`),
-                    finalContent
-                );
-            } else {
-                console.log(`✔️ No changes detected in ${fileName} file.`);
-            }
-        }
-        saveFile(recordFilePath, JSON.stringify(previousRecord, null, 4));
-        // 渲染 Axios 模板
-        if (fs.existsSync(axiosTemplatePath)) {
-            console.log("✔️ Rendering Axios template...");
-            const templateContent = fs.readFileSync(axiosTemplatePath, "utf8");
-            const renderedContent = ejs.render(templateContent, {
-                data: generationResult.files,
-            });
-            saveFile(apiIndexPath, `${axiosFilePrefix}${renderedContent}`);
-            console.log(`✔️ Axios template rendered and saved to ${apiIndexPath}`);
-        } else {
-            console.warn("✖️ Axios template not found. Skipping rendering.");
-        }
-
-        if (!fs.existsSync(apiOptionPath) && fs.existsSync(apiOptionTemplatePath)) {
-            const templateContent = fs.readFileSync(apiOptionTemplatePath, "utf8");
-            saveFile(apiOptionPath, templateContent);
-        }
-
         console.log("✔️ API client generation completed.");
     } catch (error: any) {
         console.error("✖️ Error during API generation:", error.message);
