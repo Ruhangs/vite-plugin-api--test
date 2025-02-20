@@ -1,5 +1,5 @@
 {
-  "version": "1.1.0",
+  "version": "1.1.1",
   "name": "vite-plugin-auto-generate-api",
   "description": "该插件可根据swagger文档自动生成前端接口",
   "main": "./dist/index.js",
@@ -73,8 +73,5 @@
     "fs-extra": "^11.3.0",
     "lodash": "^4.17.21",
     "swagger-typescript-api": "^13.0.23"
-  },
-  "peerDependencies": {
-    "swagger-typescript-api": ">13"
   }
 }
